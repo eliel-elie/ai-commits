@@ -84,8 +84,8 @@ aicommits config set OPENAI_KEY=your_key
 ## FAQ
 
 ```bash
-aicommits config set AI_PROVIDER=novo_provedor
-# Ex: aicommits config set AI_PROVIDER=openai
+aicommits config set AI_PROVIDER=new_provider
+# e.g: aicommits config set AI_PROVIDER=openai
 ```
 
 ### Where is my API key stored?
