@@ -3,8 +3,7 @@ import { red, green } from 'kolorist';
 
 import { 
   CONFIG_FILE, 
-  SUPPORTED_LOCALES,
-  DEFAULT_LOCALE
+  SUPPORTED_LOCALES
 } from '../config/constants.js';
 
 export function loadConfig() {
@@ -16,6 +15,42 @@ export function loadConfig() {
     console.error(red('Error reading config file:', error.message));
   }
   return {};
+}
+
+export function updateConfig(key, value = null) {
+  try {
+    const config = loadConfig();
+
+    if (value === null) {
+      return config[key];
+    }
+
+    switch (key) {
+      case 'locale':
+        if (!SUPPORTED_LOCALES[value]) {
+          console.error(red(`Locale not supported. Supported values: ${Object.keys(SUPPORTED_LOCALES).join(', ')}`));
+          process.exit(1);
+        }
+        break;
+
+      case 'provider':
+        if (!['openai', 'gemini'].includes(value)) {
+          console.error(red('Provider not supported. Use: openai or gemini'));
+          process.exit(1);
+        }
+        key = 'AI_PROVIDER';
+        break;
+    }
+
+    config[key] = value;
+    fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
+    console.log(green(`✔ ${key}=${value} saved successfully`));
+
+    return value;
+  } catch (error) {
+    console.error(red('Error saving configuration:', error.message));
+    process.exit(1);
+  }
 }
 
 export function saveConfig(key, value) {

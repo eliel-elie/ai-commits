@@ -12,9 +12,6 @@
   "license": "MIT",
   "author": "Eliel Ferreira (@elielelie)",
   "type": "module",
-  "files": [
-    "dist"
-  ],
   "bin": {
     "aicommits": "./bin/cli.js",
     "aic": "./bin/cli.js"

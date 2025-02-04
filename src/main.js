@@ -1,22 +1,40 @@
 import { intro, outro, cancel, spinner, log, confirm, isCancel } from '@clack/prompts';
 import {bgLightCyan, white, green, red, lightCyan, yellow} from 'kolorist';
 
-import {handleConfig, loadConfig} from './config.js';
+import {loadConfig, updateConfig} from './config.js';
 import { getStagedFiles, stageAllFiles, commitChanges } from './git.js';
 import { makeAPIRequest } from './api.js';
+import {FLAG_TO_CONFIG_KEY} from "../config/constants.js";
 
 export async function main() {
-  if (process.argv[2] === 'config') {
-    return handleConfig(process.argv);
+
+  const args = process.argv.slice(2);
+
+  for (const arg of args) {
+    if (arg.startsWith('--')) {
+      const [flagName, value] = arg.slice(2).split('=');
+      const configKey = FLAG_TO_CONFIG_KEY[flagName];
+
+      if (configKey) {
+        const savedValue = updateConfig(configKey, value || null);
+
+        if (!value) {
+          console.log(`${flagName}: ${savedValue || 'not defined'}`);
+        }
+        process.exit(0);
+      }
+    }
   }
+
+  const isDryRun = args.includes('--dry');
 
   const config = loadConfig();
 
   intro(bgLightCyan(white(' ai-commits ')));
-  outro(lightCyan(' Provider: ' + yellow(config['AI_PROVIDER'])));
+  outro(lightCyan(' Provider: ' + yellow(config['AI_PROVIDER']) || 'not defined'));
 
-  const allFlag = process.argv.includes('-a') || process.argv.includes('--all');
-  if (allFlag) {
+  const isStageAll = args.includes('--all');
+  if (isStageAll) {
     outro('Staging all changes');
     stageAllFiles();
   }
@@ -43,6 +61,14 @@ export async function main() {
   s.stop('Changes analyzed');
 
   if (commitMessage) {
+
+    if (isDryRun) {
+      s.stop(green('💬 Commit Message:'));
+      outro(commitMessage);
+
+      process.exit(0);
+    }
+
     const confirmed = await confirm({
       message: `Use this commit message?\n\n      ${commitMessage}\n`,
     });

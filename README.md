@@ -29,13 +29,13 @@ npx ai-commits
 
 ```bash
 # Set AI provider
-aicommits config set AI_PROVIDER=gemini
+aicommits --provider=gemini
 
 # Set API keys
-aicommits config set GEMINI_KEY=your_key_here
+aicommits --gemini-key=your_key_here
 
 # Other configurations
-aicommits config set locale=pt
+aicommits --locale=en
 
 ```
 
@@ -58,7 +58,13 @@ aic # alias
 aicommits --all
 
 # Specify provider
-aicommits config set AI_PROVIDER=gemini
+aicommits --provider=gemini
+
+# Specify model
+aicommits --model=gemini-1.5-flash
+
+# Dry message
+aicommits --dry
 
 ```
 
@@ -71,8 +77,8 @@ aicommits config set AI_PROVIDER=gemini
 2. Configure it:
 
 ```bash
-aicommits config set AI_PROVIDER=gemini
-aicommits config set GEMINI_KEY=your_key
+aicommits --provider=gemini
+aicommits --gemini-key=your_key
 ```
 
 ### OpenAI
@@ -82,15 +88,8 @@ aicommits config set GEMINI_KEY=your_key
 2. Configure it:
 
 ```bash
-aicommits config set AI_PROVIDER=openai
-aicommits config set OPENAI_KEY=your_key
-```
-
-## FAQ
-
-```bash
-aicommits config set AI_PROVIDER=new_provider
-# e.g: aicommits config set AI_PROVIDER=openai
+aicommits --provider=openai
+aicommits --openai-key==your_key
 ```
 
 ### Where is my API key stored?

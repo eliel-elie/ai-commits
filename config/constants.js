@@ -8,3 +8,11 @@ export const SUPPORTED_LOCALES = {
     'en': 'english',
     'pt-BR': 'portuguese'
 };
+
+export const FLAG_TO_CONFIG_KEY = {
+    'provider': 'AI_PROVIDER',
+    'model': 'model',
+    'locale': 'locale',
+    'gemini-key': 'GEMINI_KEY',
+    'openai-key': 'OPENAI_KEY'
+};
