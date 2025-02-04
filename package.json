@@ -10,7 +10,6 @@
     "messages"
   ],
   "license": "MIT",
-  "repository": "eliel-elie/ai-commits",
   "author": "Eliel Ferreira (@elielelie)",
   "type": "module",
   "files": [
@@ -35,5 +34,12 @@
     "branches": [
       "main"
     ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eliel-elie/ai-commits.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eliel-elie/ai-commits/issues"
   }
 }
