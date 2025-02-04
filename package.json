@@ -1,0 +1,39 @@
+{
+  "name": "ai-commits",
+  "version": "0.0.1",
+  "description": "Generate commit messages using AI analysis of your code",
+  "keywords": [
+    "ai",
+    "git",
+    "commit",
+    "generator",
+    "messages"
+  ],
+  "license": "MIT",
+  "repository": "eliel-elie/ai-commits",
+  "author": "Eliel Ferreira (@elielelie)",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "bin": {
+    "aicommits": "./bin/cli.js",
+    "aic": "./bin/cli.js"
+  },
+  "scripts": {
+    "start": "node bin/cli.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+  },
+  "dependencies": {
+    "@clack/prompts": "^0.7.0",
+    "kolorist": "^1.8.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
+  }
+}
