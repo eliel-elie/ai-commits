@@ -1,3 +1,6 @@
+import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from "../../config/constants.js";
+import {loadConfig} from "../config.js";
+
 export const COMMIT_TYPES = {
     docs: 'Documentation only changes',
     style: 'Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)',
@@ -15,7 +18,7 @@ export class PromptBuilder {
     constructor(options = {}) {
         this.options = {
             maxLength: 100,
-            language: 'english',
+            language: options.locale || loadConfig().locale || DEFAULT_LOCALE,
             context: {},
             style: 'concise',
             ...options
@@ -29,8 +32,8 @@ export class PromptBuilder {
             .map(([type, description]) => `- ${type}: '${description}'`)
             .join('\n');
 
-        return `Generate a git commit message with the following specifications:
-Language: ${mergedOptions.language}
+        return `Generate a concise git commit message written in present tense for the following code diff with the given specifications below:
+Language: ${SUPPORTED_LOCALES[mergedOptions.language]}
 Maximum Length: ${mergedOptions.maxLength} characters
 Style: ${mergedOptions.style}
 
