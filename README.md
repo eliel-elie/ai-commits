@@ -19,7 +19,7 @@ Intelligent commit message generator using different AI providers
 
 ```bash
 # Global install
-npm install -g ai-commits
+npm install -g @elielelie/ai-commits
 
 # via npx
 npx ai-commits
@@ -56,6 +56,9 @@ aic # alias
 
 # Commit including all modified files
 aicommits --all
+
+# Commit including one modified files
+aicommits --file <file_path>
 
 # Specify provider
 aicommits --provider=gemini
