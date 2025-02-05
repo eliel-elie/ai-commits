@@ -1,10 +1,12 @@
 import { loadConfig } from '../config.js';
 import en from './messages/en.js';
 import ptBR from './messages/pt-BR.js';
+import es from './messages/es.js';
 
 const messages = {
     'en': en,
-    'pt-BR': ptBR
+    'pt-BR': ptBR,
+    'es': es
 };
 
 export function t(key, params = {}) {

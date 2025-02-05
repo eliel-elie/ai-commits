@@ -5,6 +5,7 @@ import {loadConfig, updateConfig} from './config.js';
 import { getStagedFiles, stageAllFiles, commitChanges } from './git.js';
 import { makeAPIRequest } from './api.js';
 import {FLAG_TO_CONFIG_KEY} from "../config/constants.js";
+import {t} from "./i18n/index.js";
 
 export async function main() {
 
@@ -19,7 +20,7 @@ export async function main() {
         const savedValue = updateConfig(configKey, value || null);
 
         if (!value) {
-          console.log(`${flagName}: ${savedValue || 'not defined'}`);
+          console.log(`${flagName}: ${savedValue || t('cli.notConfigured')}`);
         }
         process.exit(0);
       }
@@ -30,58 +31,60 @@ export async function main() {
 
   const config = loadConfig();
 
-  intro(bgLightCyan(white(' ai-commits ')));
+  intro(bgLightCyan(white(t('cli.intro'))));
   outro(lightCyan(' Provider: ' + yellow(config['AI_PROVIDER']) || 'not defined'));
 
   const isStageAll = args.includes('--all');
   if (isStageAll) {
-    outro('Staging all changes');
+    outro(t('cli.stagingAll'));
     stageAllFiles();
   }
 
   const detectingFiles = spinner();
-  detectingFiles.start('Detecting staged files');
+  detectingFiles.start(t('cli.detectingFiles'));
 
   const diff = await getStagedFiles('diff');
   if (!diff) {
-    log.error(red("No staged changes found. Stage your changes manually, or use the `--all` flag."));
+    log.error(red(t('cli.noChanges')));
     process.exit(0);
   }
 
   const stagedFiles = await getStagedFiles('names');
-  detectingFiles.stop(`Detected ${stagedFiles.length} staged file${stagedFiles.length > 1 ? 's' : ''}:`);
+  detectingFiles.stop(t('cli.filesDetected', { count : stagedFiles.length}));
 
   stagedFiles.forEach(file => {
     console.log(`   ${file}`);
   });
 
   const s = spinner();
-  s.start('The AI is analyzing your changes');
+  s.start(t('cli.analyzing'));
   const commitMessage = await makeAPIRequest(diff);
-  s.stop('Changes analyzed');
+  s.stop(t('cli.changesAnalyzed'));
 
   if (commitMessage) {
 
     if (isDryRun) {
-      s.stop(green('💬 Commit Message:'));
+      s.stop(green(t('dryRun.commitMessage')));
       outro(commitMessage);
 
       process.exit(0);
     }
 
     const confirmed = await confirm({
-      message: `Use this commit message?\n\n      ${commitMessage}\n`,
+      message: t('cli.useMessage') + `\n\n      ${commitMessage}\n`,
+      active: t('confirm.yes'),
+      inactive: t('confirm.no'),
     });
 
     if (!confirmed || isCancel(confirmed)) {
-      cancel('Commit cancelled');
+      cancel(t('cli.commitCancelled'));
       return;
     }
 
     commitChanges(commitMessage);
-    outro(`${green('✔')} Successfully committed!`);
+    outro(`${green('✔')} ` + t('cli.commitSuccess'));
   } else {
-    log.error(red("Error: Could not generate commit message."));
+    log.error(red(t('cli.errorGenerating')));
     process.exit(1);
   }
 }

@@ -6,6 +6,7 @@ export const DEFAULT_LOCALE = 'english';
 
 export const SUPPORTED_LOCALES = {
     'en': 'english',
+    'es': 'spanish',
     'pt-BR': 'portuguese'
 };
 

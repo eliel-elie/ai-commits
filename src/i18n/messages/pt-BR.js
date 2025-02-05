@@ -22,7 +22,8 @@ export default {
         error: 'Erro ao salvar configuração:',
         notFound: '✖ {{key}} não encontrado na configuração. Use a flag apropriada para configurá-lo.',
         invalidLocale: 'Idioma inválido. Valores suportados: {{values}}',
-        invalidProvider: 'Provider inválido. Use: openai ou gemini'
+        invalidProvider: 'Provider inválido. Use: openai ou gemini',
+        errorReadFile: 'Erro ao ler o arquivo de configuração:'
     },
     dryRun: {
         title: '🔍 Modo Simulação',
@@ -30,5 +31,9 @@ export default {
         stagedFiles: '📋 Arquivos Preparados:',
         commitMessage: '💬 Mensagem de Commit:',
         diffPreview: '📊 Preview das Alterações:'
+    },
+    confirm: {
+        yes: 'Sim',
+        no: 'Não',
     }
 };

@@ -22,7 +22,8 @@ export default {
         error: 'Error al guardar la configuración:',
         notFound: '✖ {{key}} no encontrado en la configuración. Use la bandera apropiada para configurarlo.',
         invalidLocale: 'Locale inválido. Valores soportados: {{values}}',
-        invalidProvider: 'Proveedor inválido. Use: openai o gemini'
+        invalidProvider: 'Proveedor inválido. Use: openai o gemini',
+        errorReadFile: 'Error al leer el archivo de configuración:'
     },
     dryRun: {
         title: '🔍 Modo Simulación',
@@ -30,5 +31,9 @@ export default {
         stagedFiles: '📋 Archivos Preparados:',
         commitMessage: '💬 Mensaje de Commit:',
         diffPreview: '📊 Vista Previa de los Cambios:'
+    },
+    confirm: {
+        yes: 'Sí',
+        no: 'No',
     }
 };

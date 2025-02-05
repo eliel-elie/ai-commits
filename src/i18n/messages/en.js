@@ -14,7 +14,7 @@ export default {
         changesAnalyzed: 'Changes analyzed',
         useMessage: 'Use this commit message?',
         commitCancelled: 'Commit cancelled',
-        commitSuccess: '✔ Successfully committed!',
+        commitSuccess: 'Successfully committed!',
         errorGenerating: 'Error: Could not generate commit message.'
     },
     config: {
@@ -22,7 +22,8 @@ export default {
         error: 'Error saving config:',
         notFound: '✖ {{key}} not found in config. Use appropriate flag to set it.',
         invalidLocale: 'Invalid locale. Supported values are: {{values}}',
-        invalidProvider: 'Invalid provider. Use: openai or gemini'
+        invalidProvider: 'Invalid provider. Use: openai or gemini',
+        errorReadFile: 'Error reading config file:'
     },
     dryRun: {
         title: '🔍 Dry Run Mode',
@@ -30,5 +31,9 @@ export default {
         stagedFiles: '📋 Staged Files:',
         commitMessage: '💬 Commit Message:',
         diffPreview: '📊 Diff Preview:'
+    },
+    confirm: {
+        yes: 'Yes',
+        no: 'No',
     }
 };
