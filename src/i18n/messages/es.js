@@ -1,0 +1,34 @@
+export default {
+    cli: {
+        intro: ' ai-commits ',
+        provider: 'Proveedor',
+        notConfigured: 'no configurado',
+        stagingAll: 'Preparando todos los cambios',
+        detectingFiles: 'Detectando archivos',
+        noChanges: 'No se encontraron cambios preparados. Prepare sus cambios manualmente o use --all',
+        filesDetected: {
+            one: 'Detectado {{count}} archivo preparado:',
+            other: 'Detectados {{count}} archivos preparados:'
+        },
+        analyzing: 'La IA está analizando sus cambios',
+        changesAnalyzed: 'Cambios analizados',
+        useMessage: '¿Usar este mensaje de commit?',
+        commitCancelled: 'Commit cancelado',
+        commitSuccess: '✔ ¡Commit realizado con éxito!',
+        errorGenerating: 'Error: No se pudo generar el mensaje de commit.'
+    },
+    config: {
+        saved: '✔ {{key}}={{value}} guardado con éxito',
+        error: 'Error al guardar la configuración:',
+        notFound: '✖ {{key}} no encontrado en la configuración. Use la bandera apropiada para configurarlo.',
+        invalidLocale: 'Locale inválido. Valores soportados: {{values}}',
+        invalidProvider: 'Proveedor inválido. Use: openai o gemini'
+    },
+    dryRun: {
+        title: '🔍 Modo Simulación',
+        divider: '==============',
+        stagedFiles: '📋 Archivos Preparados:',
+        commitMessage: '💬 Mensaje de Commit:',
+        diffPreview: '📊 Vista Previa de los Cambios:'
+    }
+};
