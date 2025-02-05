@@ -15,7 +15,10 @@ export default {
         useMessage: '¿Usar este mensaje de commit?',
         commitCancelled: 'Commit cancelado',
         commitSuccess: '✔ ¡Commit realizado con éxito!',
-        errorGenerating: 'Error: No se pudo generar el mensaje de commit.'
+        errorGenerating: 'Error: No se pudo generar el mensaje de commit.',
+        stagingFile: 'Preparando archivo: {{file}}',
+        noFileSpecified: 'Error: No se especificó ningún archivo después de la bandera --file. Uso: aicommits --file <ruta_del_archivo>',
+        fileStageError: 'Error al preparar el archivo {{file}}: {{error}}'
     },
     config: {
         saved: '✔ {{key}}={{value}} guardado con éxito',

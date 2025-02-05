@@ -7,6 +7,12 @@ export function stageAllFiles() {
   execSync(command, { stdio: 'inherit' });
 }
 
+export function stageFile(path) {
+  const isWindows = process.platform === 'win32';
+  const command = isWindows ? `git add "${path}" 2>NUL` : `'git add "${path}" 2>/dev/null`;
+  execSync(command, { stdio: 'inherit' });
+}
+
 export function getStagedFiles(type = 'names') {
   try {
     if (type === 'names') {

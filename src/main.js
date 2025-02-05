@@ -40,10 +40,25 @@ export async function main() {
     stageAllFiles();
   }
 
-  const isFileAdd = args.includes('--file');
-  if (isFileAdd) {
+  const fileIndex = args.indexOf('--file');
+  if (fileIndex !== -1) {
+    const filePath = args[fileIndex + 1];
+
+    if (!filePath) {
+      log.error(red(t('cli.noFileSpecified')));
+      process.exit(1);
+    }
+
+    outro(t('cli.stagingFile', { file: filePath }));
+    try {
+      await stageFile(filePath);
+    } catch (error) {
+      log.error(red(t('cli.fileStageError', { file: filePath, error: error.message })));
+      process.exit(1);
+    }
+  } else if (args.includes('--all')) {
     outro(t('cli.stagingAll'));
-    stageFile(process.argv.slice(3));
+    await stageAllFiles();
   }
 
   const detectingFiles = spinner();

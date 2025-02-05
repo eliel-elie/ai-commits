@@ -15,7 +15,10 @@ export default {
         useMessage: 'Use this commit message?',
         commitCancelled: 'Commit cancelled',
         commitSuccess: 'Successfully committed!',
-        errorGenerating: 'Error: Could not generate commit message.'
+        errorGenerating: 'Error: Could not generate commit message.',
+        stagingFile: 'Staging file: {{file}}',
+        noFileSpecified: 'Error: No file specified after --file flag. Usage: aicommits --file <file_path>',
+        fileStageError: 'Error staging file {{file}}: {{error}}'
     },
     config: {
         saved: '✔ {{key}}={{value}} saved successfully',
