@@ -2,7 +2,7 @@ import { intro, outro, cancel, spinner, log, confirm, isCancel } from '@clack/pr
 import {bgLightCyan, white, green, red, lightCyan, yellow} from 'kolorist';
 
 import {loadConfig, updateConfig} from './config.js';
-import { getStagedFiles, stageAllFiles, commitChanges } from './git.js';
+import {getStagedFiles, stageAllFiles, commitChanges, stageFile} from './git.js';
 import { makeAPIRequest } from './api.js';
 import {FLAG_TO_CONFIG_KEY} from "../config/constants.js";
 import {t} from "./i18n/index.js";
@@ -38,6 +38,12 @@ export async function main() {
   if (isStageAll) {
     outro(t('cli.stagingAll'));
     stageAllFiles();
+  }
+
+  const isFileAdd = args.includes('--file');
+  if (isFileAdd) {
+    outro(t('cli.stagingAll'));
+    stageFile(process.argv.slice(3));
   }
 
   const detectingFiles = spinner();
