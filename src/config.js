@@ -6,6 +6,7 @@ import {
   SUPPORTED_LOCALES
 } from '../config/constants.js';
 import {t} from "./i18n/index.js";
+import {log} from "@clack/prompts";
 
 export function loadConfig() {
   try {
@@ -13,7 +14,7 @@ export function loadConfig() {
       return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
     }
   } catch (error) {
-    console.error(red(t('config.errorReadFile'), error.message));
+    log.error(red(t('config.errorReadFile'), error.message));
   }
   return {};
 }
@@ -29,14 +30,14 @@ export function updateConfig(key, value = null) {
     switch (key) {
       case 'locale':
         if (!SUPPORTED_LOCALES[value]) {
-          console.error(red(t('config.invalidLocale', { values: Object.keys(SUPPORTED_LOCALES).join(', ') })));
+          log.error(red(t('config.invalidLocale', { values: Object.keys(SUPPORTED_LOCALES).join(', ') })));
           process.exit(1);
         }
         break;
 
       case 'provider':
         if (!['openai', 'gemini'].includes(value)) {
-          console.error(red(t('config.invalidProvider')));
+          log.error(red(t('config.invalidProvider')));
           process.exit(1);
         }
         key = 'AI_PROVIDER';
@@ -51,11 +52,11 @@ export function updateConfig(key, value = null) {
 
     config[key] = value;
     fs.writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2));
-    console.log(green(t('config.saved',{ key: key, value: value})));
+    log.message(green(t('config.saved',{ key: key, value: value})));
 
     return value;
   } catch (error) {
-    console.error(red(t('config.error'), error.message));
+    log.error(red(t('config.error'), error.message));
     process.exit(1);
   }
 }
@@ -64,7 +65,7 @@ export function getConfig(key, defaultValue = null) {
   const config = loadConfig();
   const value = config[key];
   if (!value && defaultValue === null) {
-    console.error(red(t('config.notFound', { key: key })));
+    log.error(red(t('config.notFound', { key: key })));
     process.exit(1);
   }
   return value || defaultValue;

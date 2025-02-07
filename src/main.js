@@ -20,7 +20,7 @@ export async function main() {
         const savedValue = updateConfig(configKey, value || null);
 
         if (!value) {
-          console.log(`${flagName}: ${savedValue || t('cli.notConfigured')}`);
+          log.message(`${flagName}: ${savedValue || t('cli.notConfigured')}`);
         }
         process.exit(0);
       }
@@ -74,7 +74,7 @@ export async function main() {
   detectingFiles.stop(t('cli.filesDetected', { count : stagedFiles.length}));
 
   stagedFiles.forEach(file => {
-    console.log(`   ${file}`);
+    log.message(`   ${file}`);
   });
 
   const s = spinner();
