@@ -1,11 +1,11 @@
 import { intro, outro, cancel, spinner, log, confirm, isCancel } from '@clack/prompts';
 import {bgLightCyan, white, green, red, lightCyan, yellow} from 'kolorist';
-
 import {loadConfig, updateConfig} from './config.js';
 import {getStagedFiles, stageAllFiles, commitChanges, stageFile} from './git.js';
 import { makeAPIRequest } from './api.js';
 import {FLAG_TO_CONFIG_KEY} from "../config/constants.js";
 import {t} from "./i18n/index.js";
+import fs from "fs";
 
 export async function main() {
 
@@ -33,6 +33,12 @@ export async function main() {
 
   intro(bgLightCyan(white(t('cli.intro'))));
   outro(lightCyan(' Provider: ' + yellow(config['AI_PROVIDER']) || 'not defined'));
+
+  if (args.includes('--version')) {
+    const version = JSON.parse(fs.readFileSync('./package.json')).version;
+    outro(t('cli.version', {version: version}));
+    process.exit(1);
+  }
 
   const isStageAll = args.includes('--all');
   if (isStageAll) {

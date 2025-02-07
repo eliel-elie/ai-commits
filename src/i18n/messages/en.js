@@ -18,7 +18,8 @@ export default {
         errorGenerating: 'Error: Could not generate commit message.',
         stagingFile: 'Staging file: {{file}}',
         noFileSpecified: 'Error: No file specified after --file flag. Usage: aicommits --file <file_path>',
-        fileStageError: 'Error staging file {{file}}: {{error}}'
+        fileStageError: 'Error staging file {{file}}: {{error}}',
+        version: 'Version: {{version}}'
     },
     config: {
         saved: '✔ {{key}}={{value}} saved successfully',

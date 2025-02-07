@@ -18,7 +18,8 @@ export default {
         errorGenerating: 'Erro: Não foi possível gerar a mensagem de commit.',
         noFileSpecified: 'Erro: Nenhum arquivo especificado após a flag --file. Use: aicommits --file <caminho_do_arquivo>',
         stagingFile: 'Preparando arquivo: {{file}}',
-        fileStageError: 'Erro ao preparar o arquivo {{file}}: {{error}}'
+        fileStageError: 'Erro ao preparar o arquivo {{file}}: {{error}}',
+        version: 'Versão: {{version}}'
     },
     config: {
         saved: '✔ {{key}}={{value}} salvo com sucesso',
