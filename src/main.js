@@ -61,9 +61,6 @@ export async function main() {
       log.error(red(t('cli.fileStageError', { file: filePath, error: error.message })));
       process.exit(1);
     }
-  } else if (args.includes('--all')) {
-    outro(t('cli.stagingAll'));
-    await stageAllFiles();
   }
 
   const detectingFiles = spinner();
