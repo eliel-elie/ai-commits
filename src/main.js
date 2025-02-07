@@ -5,7 +5,7 @@ import {getStagedFiles, stageAllFiles, commitChanges, stageFile} from './git.js'
 import { makeAPIRequest } from './api.js';
 import {FLAG_TO_CONFIG_KEY} from "../config/constants.js";
 import {t} from "./i18n/index.js";
-import fs from "fs";
+import pkg from '../package.json' with { type: "json" };
 
 export async function main() {
 
@@ -35,8 +35,7 @@ export async function main() {
   outro(lightCyan(' Provider: ' + yellow(config['AI_PROVIDER']) || 'not defined'));
 
   if (args.includes('--version')) {
-    const version = JSON.parse(fs.readFileSync('./package.json')).version;
-    outro(t('cli.version', {version: version}));
+    outro(t('cli.version', {version: pkg.version}));
     process.exit(1);
   }
 
