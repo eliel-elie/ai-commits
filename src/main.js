@@ -39,12 +39,6 @@ export async function main() {
     process.exit(1);
   }
 
-  const isStageAll = args.includes('--all');
-  if (isStageAll) {
-    outro(t('cli.stagingAll'));
-    stageAllFiles();
-  }
-
   const fileIndex = args.indexOf('--file');
   if (fileIndex !== -1) {
     const filePath = args[fileIndex + 1];
@@ -61,6 +55,10 @@ export async function main() {
       log.error(red(t('cli.fileStageError', { file: filePath, error: error.message })));
       process.exit(1);
     }
+
+  } else if (args.includes('--all')) {
+    outro(t('cli.stagingAll'));
+    await stageAllFiles();
   }
 
   const detectingFiles = spinner();
