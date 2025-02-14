@@ -1,6 +1,6 @@
 {
   "name": "@elielelie/ai-commits",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Generate commit messages using AI analysis of your code",
   "keywords": [
     "ai",
