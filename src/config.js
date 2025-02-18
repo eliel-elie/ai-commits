@@ -36,7 +36,7 @@ export function updateConfig(key, value = null) {
         break;
 
       case 'provider':
-        if (!['openai', 'gemini'].includes(value)) {
+        if (!['openai', 'gemini', 'deepseek'].includes(value)) {
           log.error(red(t('config.invalidProvider')));
           process.exit(1);
         }

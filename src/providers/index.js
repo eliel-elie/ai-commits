@@ -1,10 +1,12 @@
 
 import { OpenAIProvider } from './openai.js';
 import { GeminiProvider } from './gemini.js';
+import { DeepSeekProvider } from './deepSeek.js';
 
 const PROVIDERS = {
     openai: OpenAIProvider,
-    gemini: GeminiProvider
+    gemini: GeminiProvider,
+    deepseek: DeepSeekProvider
 };
 
 export function createAIProvider(type, config) {
@@ -19,5 +21,6 @@ export function createAIProvider(type, config) {
 
 export {
     OpenAIProvider,
-    GeminiProvider
+    GeminiProvider,
+    DeepSeekProvider
 };

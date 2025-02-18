@@ -29,9 +29,15 @@ export function getStagedFiles(type = 'names') {
   }
 }
 
-export function commitChanges(message) {
+export function commitChanges(message, skipVerify = false) {
   try {
-    execSync(`git commit --no-verify -m "${message.replace(/"/g, '\\"')}"`, { stdio: 'inherit' });
+
+    const command = skipVerify
+        ? `git commit --no-verify -m "${message.replace(/"/g, '\\"')}"`
+        : `git commit -m "${message.replace(/"/g, '\\"')}"`;
+
+    execSync(command, { stdio: 'inherit' });
+
   } catch (error) {
     console.error(red('Error committing changes:', error.message));
     process.exit(1);

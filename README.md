@@ -41,10 +41,11 @@ aicommits --locale=en
 
 ## Supported Providers
 
-|Provider	| Default Model	       |Environment Variable|
-|----------|----------------------|--------------------|
-|Gemini	| gemini-1.5-flash	 |GEMINI_KEY|
-|OpenAI	| gpt-3.5-turbo	       |OPENAI_KEY|
+| Provider	       | Default Model	       | Environment Variable |
+|-----------------|----------------------|----------------------|
+| Gemini	         | gemini-1.5-flash	 | GEMINI_KEY           |
+| OpenAI	         | gpt-3.5-turbo	       | OPENAI_KEY           |
+| DeepSeek	 | deepseek-chat	       | DEEPSEEK_KEY   |
 
 ## Usage
 
@@ -68,6 +69,9 @@ aicommits --model=gemini-1.5-flash
 
 # Dry message
 aicommits --dry
+
+# Ignore hooks
+aicommits --no-verify
 
 ```
 
@@ -95,6 +99,17 @@ aicommits --provider=openai
 aicommits --openai-key==your_key
 ```
 
+### DeepSeek
+
+1. Obtain an API Key from [DeepSeek Platform](https://platform.deepseek.com/).
+
+2. Configure it:
+
+```bash
+aicommits --provider=deepseek
+aicommits --deepseek-key==your_key
+```
+ 
 ### Where is my API key stored?
 
 Credentials are stored locally at ```~/.ai-commits```

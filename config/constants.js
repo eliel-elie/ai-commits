@@ -15,5 +15,6 @@ export const FLAG_TO_CONFIG_KEY = {
     'model': 'model',
     'locale': 'locale',
     'gemini-key': 'GEMINI_KEY',
-    'openai-key': 'OPENAI_KEY'
+    'openai-key': 'OPENAI_KEY',
+    'deepseek-key': 'DEEPSEEK_KEY'
 };

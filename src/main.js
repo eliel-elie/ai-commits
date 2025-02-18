@@ -29,6 +29,8 @@ export async function main() {
 
   const isDryRun = args.includes('--dry');
 
+  const skipVerify = args.includes('--no-verify');
+
   const config = loadConfig();
 
   intro(bgLightCyan(white(t('cli.intro'))));
@@ -102,7 +104,7 @@ export async function main() {
       return;
     }
 
-    commitChanges(commitMessage);
+    commitChanges(commitMessage, skipVerify);
     outro(`${green('✔')} ` + t('cli.commitSuccess'));
   } else {
     log.error(red(t('cli.errorGenerating')));
