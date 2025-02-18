@@ -31,7 +31,8 @@ export class OpenAIProvider extends BaseAIProvider {
                 headers: {
                     'Authorization': `Bearer ${this.config.apiKey}`,
                     'Content-Type': 'application/json'
-                }
+                },
+                rejectUnauthorized: false
             };
 
             const req = https.request(requestOptions, (res) => {
