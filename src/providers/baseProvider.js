@@ -1,10 +1,14 @@
 import { createCommitPrompt } from '../utils/promptGenerator.js';
+import {loadConfig} from "../config.js";
 
 export class BaseAIProvider {
     constructor(config = {}) {
+
+        const fileConfig = loadConfig();
+
         this.config = {
             apiKey: config.apiKey,
-            model: config.model ? config.model : this.defaultModel,
+            model: fileConfig.model || config.model || this.defaultModel,
             ...config
         };
     }

@@ -1,5 +1,8 @@
 import { execSync } from 'child_process';
 import { red } from 'kolorist';
+import {t} from "./i18n/index.js";
+import {log} from "@clack/prompts";
+import {hasPreCommitHook, runPreCommitHook} from "./utils/hooks.js";
 
 export function stageAllFiles() {
   const isWindows = process.platform === 'win32';
@@ -24,13 +27,21 @@ export function getStagedFiles(type = 'names') {
       return execSync('git diff --staged').toString();
     }
   } catch (error) {
-    console.error(red('Error retrieving staged files:', error.message));
+    log.error(red(t('git.errorStagedFiles'), error.message));
     process.exit(1);
   }
 }
 
 export function commitChanges(message, skipVerify = false) {
   try {
+
+    if (!skipVerify && hasPreCommitHook()) {
+      const hookSuccess = runPreCommitHook();
+      if (!hookSuccess) {
+        log.error(red(t('git.failedPreCommit')));
+        process.exit(1);
+      }
+    }
 
     const command = skipVerify
         ? `git commit --no-verify -m "${message.replace(/"/g, '\\"')}"`
@@ -39,7 +50,7 @@ export function commitChanges(message, skipVerify = false) {
     execSync(command, { stdio: 'inherit' });
 
   } catch (error) {
-    console.error(red('Error committing changes:', error.message));
+    log.error(red(t('git.errorCommit'), error.message));
     process.exit(1);
   }
 }

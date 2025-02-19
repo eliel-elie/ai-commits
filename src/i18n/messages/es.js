@@ -39,5 +39,12 @@ export default {
     confirm: {
         yes: 'Sí',
         no: 'No',
+    },
+    git: {
+        reStaging: 'El gancho de pre-confirmación modificó algunos archivos. Cambios en la puesta en escena...',
+        failedPreCommit: 'El gancho de pre-confirmación falló. Corrija los problemas antes de continuar.',
+        error: 'Error al ejecutar el gancho de pre-confirmación:',
+        errorStagedFiles: 'Error al recuperar archivos almacenados:',
+        errorCommit: 'Error al confirmar los cambios:'
     }
 };

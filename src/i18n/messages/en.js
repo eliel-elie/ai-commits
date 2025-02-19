@@ -39,5 +39,12 @@ export default {
     confirm: {
         yes: 'Yes',
         no: 'No',
+    },
+    git: {
+        reStaging: 'Pre-commit hook modified some files. Re-staging changes...',
+        failedPreCommit: 'Pre-commit hook failed. Fix issues before continuing.',
+        error: 'Error executing pre-commit hook:',
+        errorStagedFiles: 'Error retrieving staged files:',
+        errorCommit: 'Error committing changes:'
     }
 };

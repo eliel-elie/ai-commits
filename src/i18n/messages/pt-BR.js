@@ -1,3 +1,5 @@
+import {getStagedFiles} from "../../git.js";
+
 export default {
     cli: {
         intro: ' ai-commits ',
@@ -39,5 +41,12 @@ export default {
     confirm: {
         yes: 'Sim',
         no: 'Não',
+    },
+    git: {
+        reStaging: 'Pre-commit hook modificou alguns arquivos. Re-staging alterações...',
+        failedPreCommit: 'Pre-commit hook falhou. Corriga os problemas antes de continuar.',
+        error: 'Erro ao executar pre-commit hook:',
+        errorStagedFiles: 'Erro ao recuperar arquivos mofificados:',
+        errorCommit: 'Erro ao confirmar alterações:'
     }
 };
