@@ -41,7 +41,9 @@ export async function main() {
     process.exit(1);
   }
 
+  let specificFile = null;
   const fileIndex = args.indexOf('--file');
+
   if (fileIndex !== -1) {
     const filePath = args[fileIndex + 1];
 
@@ -50,6 +52,7 @@ export async function main() {
       process.exit(1);
     }
 
+    specificFile = filePath;
     outro(t('cli.stagingFile', { file: filePath }));
     try {
       await stageFile(filePath);
@@ -66,13 +69,13 @@ export async function main() {
   const detectingFiles = spinner();
   detectingFiles.start(t('cli.detectingFiles'));
 
-  const diff = await getStagedFiles('diff');
+  const diff = await getStagedFiles('diff', specificFile);
   if (!diff) {
     log.error(red(t('cli.noChanges')));
     process.exit(0);
   }
 
-  const stagedFiles = await getStagedFiles('names');
+  const stagedFiles = await getStagedFiles('names', specificFile);
   detectingFiles.stop(t('cli.filesDetected', { count : stagedFiles.length}));
 
   stagedFiles.forEach(file => {

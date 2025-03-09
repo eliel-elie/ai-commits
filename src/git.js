@@ -12,20 +12,36 @@ export function stageAllFiles() {
 
 export function stageFile(path) {
   const isWindows = process.platform === 'win32';
-  const command = isWindows ? `git add "${path}" 2>NUL` : `'git add "${path}" 2>/dev/null`;
+  const command = isWindows ? `git add "${path}" 2>NUL` : `git add "${path}" 2>/dev/null`;
   execSync(command, { stdio: 'inherit' });
 }
 
-export function getStagedFiles(type = 'names') {
+export function getStagedFiles(type = 'names', specificFile = null) {
   try {
-    if (type === 'names') {
-      const files = execSync('git diff --staged --name-only').toString().trim().split('\n');
-      return files.filter(file => file.length > 0);
+
+    if (specificFile) {
+
+      if (type === 'names') {
+        return [specificFile];
+      }
+
+      if (type === 'diff') {
+        return execSync(`git diff --staged -- "${specificFile}"`).toString();
+      }
+
+    } else {
+
+      if (type === 'names') {
+        const files = execSync('git diff --staged --name-only').toString().trim().split('\n');
+        return files.filter(file => file.length > 0);
+      }
+
+      if (type === 'diff') {
+        return execSync('git diff --staged').toString();
+      }
+
     }
-    
-    if (type === 'diff') {
-      return execSync('git diff --staged').toString();
-    }
+
   } catch (error) {
     log.error(red(t('git.errorStagedFiles'), error.message));
     process.exit(1);
