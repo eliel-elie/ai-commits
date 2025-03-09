@@ -107,7 +107,7 @@ export async function main() {
       return;
     }
 
-    commitChanges(commitMessage, skipVerify);
+    commitChanges(commitMessage, skipVerify, specificFile);
     outro(`${green('✔')} ` + t('cli.commitSuccess'));
   } else {
     log.error(red(t('cli.errorGenerating')));
