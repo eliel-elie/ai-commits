@@ -48,7 +48,7 @@ export function getStagedFiles(type = 'names', specificFile = null) {
   }
 }
 
-export function commitChanges(message, skipVerify = false) {
+export function commitChanges(message, skipVerify = false, specificFile = null) {
   try {
 
     if (!skipVerify && hasPreCommitHook()) {
@@ -59,9 +59,20 @@ export function commitChanges(message, skipVerify = false) {
       }
     }
 
-    const command = skipVerify
-        ? `git commit --no-verify -m "${message.replace(/"/g, '\\"')}"`
-        : `git commit -m "${message.replace(/"/g, '\\"')}"`;
+    let command;
+    if (specificFile) {
+
+      command = skipVerify
+          ? `git commit --no-verify -m "${message.replace(/"/g, '\\"')}" "${specificFile}"`
+          : `git commit -m "${message.replace(/"/g, '\\"')}" "${specificFile}"`;
+
+    } else {
+
+      command = skipVerify
+          ? `git commit --no-verify -m "${message.replace(/"/g, '\\"')}"`
+          : `git commit -m "${message.replace(/"/g, '\\"')}"`;
+
+    }
 
     execSync(command, { stdio: 'inherit' });
 
