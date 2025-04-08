@@ -38,7 +38,20 @@ export class GeminiProvider extends BaseAIProvider {
                     try {
                         const message = this._handleAPIResponse(
                             responseData,
-                            (parsedResponse) => parsedResponse.candidates[0]?.content?.parts[0]?.text
+                            (parsedResponse) => {
+                                let text = parsedResponse.candidates[0]?.content?.parts[0]?.text
+
+                                if (text) {
+                                    text = text.trim();
+                                    if ((text.startsWith("'") && text.endsWith("'")) ||
+                                        (text.startsWith('"') && text.endsWith('"')) ||
+                                        (text.startsWith('`') && text.endsWith('`'))) {
+                                        text = text.substring(1, text.length - 1);
+                                    }
+                                }
+
+                                return text;
+                            }
                         );
                         resolve(message);
                     } catch (error) {
