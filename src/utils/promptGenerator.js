@@ -1,4 +1,4 @@
-import {DEFAULT_LOCALE, SUPPORTED_LOCALES} from "../../config/constants.js";
+import {DEFAULT_LOCALE, DEFAULT_MAX_LENGTH, SUPPORTED_LOCALES} from "../../config/constants.js";
 import {loadConfig} from "../config.js";
 
 export const COMMIT_TYPES = {
@@ -17,7 +17,7 @@ export const COMMIT_TYPES = {
 export class PromptBuilder {
     constructor(options = {}) {
         this.options = {
-            maxLength: 100,
+            maxLength: loadConfig().MAX_LENGTH || DEFAULT_MAX_LENGTH,
             language: options.locale || loadConfig().locale || DEFAULT_LOCALE,
             context: {},
             style: 'concise',
