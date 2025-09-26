@@ -3,7 +3,7 @@ import { BaseAIProvider } from './baseProvider.js';
 
 export class GeminiProvider extends BaseAIProvider {
     get defaultModel() {
-        return 'gemini-1.5-flash';
+        return 'gemini-2.0-flash';
     }
 
     async _generateMessage(prompt, options) {
