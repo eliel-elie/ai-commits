@@ -14,6 +14,9 @@ export class GeminiProvider extends BaseAIProvider {
                 }
             ],
             generationConfig: {
+                thinkingConfig : {
+                    thinkingBudget: 0
+                },
                 temperature: 0.7,
                 maxOutputTokens: 200
             }
@@ -22,10 +25,11 @@ export class GeminiProvider extends BaseAIProvider {
         return new Promise((resolve, reject) => {
             const requestOptions = {
                 hostname: 'generativelanguage.googleapis.com',
-                path: `/v1beta/models/${this.config.model}:generateContent?key=${this.config.apiKey}`,
+                path: `/v1beta/models/${this.config.model}:generateContent`,
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type'  : 'application/json',
+                    'x-goog-api-key': this.config.apiKey
                 }
             };
 
