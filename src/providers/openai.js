@@ -3,25 +3,47 @@ import { BaseAIProvider } from './baseProvider.js';
 
 export class OpenAIProvider extends BaseAIProvider {
     get defaultModel() {
-        return 'gpt-3.5-turbo';
+        return 'gpt-5-mini';
     }
 
     async _generateMessage(prompt, options) {
-        const data = JSON.stringify({
-            model: this.config.model,
-            messages: [
+        const model = this.config.model.trim().toLowerCase();
+        const isRestricted = model.startsWith('o1') || model.startsWith('gpt-5');
+        
+        const systemContent = prompt.split("Analyze the")[0];
+        
+        let messages;
+        if (isRestricted) {
+             messages = [
+                {
+                    role: 'user',
+                    content: systemContent + "\n\nAnalyze the" + prompt.split("Analyze the")[1]
+                }
+            ];
+        } else {
+             messages = [
                 {
                     role: 'system',
-                    content: prompt.split("Analyze the")[0]
+                    content: systemContent
                 },
                 {
                     role: 'user',
                     content: prompt
                 }
-            ],
-            temperature: 0.7,
-            max_tokens: 200
-        });
+            ];
+        }
+
+        const payload = {
+            model: this.config.model,
+            messages: messages,
+            max_completion_tokens: 5000
+        };
+
+        if (!isRestricted) {
+            payload.temperature = 0.7;
+        }
+
+        const data = JSON.stringify(payload);
 
         return new Promise((resolve, reject) => {
             const requestOptions = {
@@ -48,6 +70,7 @@ export class OpenAIProvider extends BaseAIProvider {
                         );
                         resolve(message);
                     } catch (error) {
+                        error.message = `[Model: ${this.config.model}] ${error.message}`;
                         reject(error);
                     }
                 });
