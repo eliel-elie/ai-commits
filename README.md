@@ -36,6 +36,32 @@ go build -o aic.exe ./cmd/aic
 go install github.com/eliel-elie/ai-commits/cmd/aic@latest
 ```
 
+### Building Binaries (Windows & Linux)
+
+You can compile binaries for both platforms from either Windows or Linux using `GOOS` and `GOARCH`.
+
+**From Windows (PowerShell):**
+
+```powershell
+# Windows (64-bit)
+$env:GOOS="windows"; $env:GOARCH="amd64"; go build -ldflags="-s -w" -o aic.exe ./cmd/aic
+
+# Linux (64-bit)
+$env:GOOS="linux"; $env:GOARCH="amd64"; go build -ldflags="-s -w" -o aic ./cmd/aic
+```
+
+**From Linux / macOS (Bash):**
+
+```bash
+# Linux (64-bit)
+GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o aic ./cmd/aic
+
+# Windows (64-bit)
+GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o aic.exe ./cmd/aic
+```
+
+> Tip: For ARM64 targets (e.g. Raspberry Pi or ARM servers), use `GOARCH=arm64`.
+
 ## Configuration
 
 Settings are loaded in order of precedence: **CLI flags > Environment variables > Local `.aicommits.json` > Global `~/.ai-commits`**.

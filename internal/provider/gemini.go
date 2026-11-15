@@ -12,7 +12,7 @@ import (
 	"github.com/eliel-elie/ai-commits/internal/prompt"
 )
 
-const defaultGeminiModel = "gemini-2.5-flash"
+const defaultGeminiModel = "gemini-3.1-flash-lite"
 
 type geminiProvider struct {
 	client    *http.Client

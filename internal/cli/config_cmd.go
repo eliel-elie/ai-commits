@@ -49,24 +49,57 @@ func newConfigSetCmd() *cobra.Command {
 func newConfigGetCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "get <key>",
-		Short: "Get a configuration value from ~/.ai-commits",
+		Short: "Get a configuration value (resolved with defaults)",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			canonical, err := config.NormalizeKey(args[0])
+			if err != nil {
+				canonical = args[0]
+			}
+
 			raw, err := config.GetGlobalRaw()
 			if err != nil {
 				return err
 			}
-			val, ok := raw[args[0]]
-			if !ok {
-				return fmt.Errorf("key %q not set", args[0])
-			}
-			if strings.HasSuffix(strings.ToUpper(args[0]), "_KEY") {
-				if s, ok := val.(string); ok {
-					val = config.MaskSecret(s)
+			if val, ok := raw[canonical]; ok {
+				if strings.HasSuffix(strings.ToUpper(canonical), "_KEY") {
+					if s, ok := val.(string); ok {
+						val = config.MaskSecret(s)
+					}
 				}
+				fmt.Println(val)
+				return nil
 			}
-			fmt.Println(val)
-			return nil
+
+			cfg, err := config.Load(".")
+			if err != nil {
+				return err
+			}
+			switch canonical {
+			case "AI_PROVIDER":
+				fmt.Printf("%s (default)\n", cfg.Provider)
+				return nil
+			case "model":
+				m := cfg.Model
+				if m == "" {
+					m = config.DefaultModelFor(cfg.Provider)
+				}
+				if m != "" {
+					fmt.Printf("%s (default)\n", m)
+					return nil
+				}
+			case "locale":
+				fmt.Printf("%s (default)\n", cfg.Locale)
+				return nil
+			case "MAX_LENGTH":
+				fmt.Printf("%d (default)\n", cfg.MaxLength)
+				return nil
+			case "max_tokens":
+				fmt.Printf("%d (default)\n", cfg.MaxTokens)
+				return nil
+			}
+
+			return fmt.Errorf("key %q not set", args[0])
 		},
 	}
 }

@@ -19,7 +19,6 @@ const (
 	GlobalConfigName = ".ai-commits"
 )
 
-// SupportedLocales maps CLI locale codes to language names used in prompts.
 var SupportedLocales = map[string]string{
 	"en":    "english",
 	"es":    "spanish",
@@ -46,10 +45,10 @@ type Config struct {
 	BaseURL   string   `json:"base_url,omitempty"`
 	Exclude   []string `json:"exclude,omitempty"`
 
-	GeminiKey   string `json:"GEMINI_KEY,omitempty"`
-	OpenAIKey   string `json:"OPENAI_KEY,omitempty"`
-	DeepSeekKey string `json:"DEEPSEEK_KEY,omitempty"`
-	GroqKey     string `json:"GROQ_KEY,omitempty"`
+	GeminiKey     string `json:"GEMINI_KEY,omitempty"`
+	OpenAIKey     string `json:"OPENAI_KEY,omitempty"`
+	DeepSeekKey   string `json:"DEEPSEEK_KEY,omitempty"`
+	GroqKey       string `json:"GROQ_KEY,omitempty"`
 	OpenRouterKey string `json:"OPENROUTER_KEY,omitempty"`
 }
 
@@ -307,6 +306,29 @@ func MaskSecret(s string) string {
 		return "****"
 	}
 	return s[:4] + strings.Repeat("*", len(s)-8) + s[len(s)-4:]
+}
+
+func DefaultModelFor(provider string) string {
+	switch strings.ToLower(strings.TrimSpace(provider)) {
+	case "gemini", "":
+		return "gemini-3.1-flash-lite"
+	case "openai":
+		return "gpt-5-mini"
+	case "deepseek":
+		return "deepseek-chat"
+	case "groq":
+		return "llama-3.3-70b-versatile"
+	case "openrouter":
+		return "openai/gpt-4o-mini"
+	case "ollama":
+		return "llama3.2"
+	default:
+		return ""
+	}
+}
+
+func NormalizeKey(key string) (string, error) {
+	return normalizeKey(key)
 }
 
 func normalizeKey(key string) (string, error) {
