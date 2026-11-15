@@ -1,6 +1,6 @@
-# AI Commits 🤖📝
+# AI Commits (`aic`) 🤖📝
 
-Intelligent commit message generator using different AI providers
+Intelligent git commit message generator written in Go, powered by multiple AI providers.
 
 <div>
   <div>
@@ -9,110 +9,117 @@ Intelligent commit message generator using different AI providers
 </div>
 
 ## Key Features
-- ✅ Supports multiple AI providers (Gemini, OpenAI, and more)
-- 🔧 Simple CLI configuration
-- 🌍 Multi-language support (English, Portuguese, and others)
-- 💡 Context-aware message generation
-- 📦 Modular and extensible architecture
+- ⚡ **Single static binary** — Fast startup, zero runtime dependencies
+- 🤖 **Multiple AI providers** — Gemini, OpenAI, DeepSeek, Groq, OpenRouter, and Ollama (local)
+- 📁 **Target any directory (`-C` / `--dir`)** — Run against any repository path
+- 📄 **Multi-file commits (`-f` / `--file`)** — Stage and commit one or more specific files without touching the rest of your staging area
+- 📝 **Full multi-line commit support** — Uses `git commit -F -` via `stdin` (no shell escaping issues or message truncation)
+- 🎨 **Interactive TUI** — Confirm, edit, regenerate with an optional hint, or cancel
+- 🌍 **Multi-language** — `en`, `pt-BR`, and `es`
+- 🔒 **Smart diff handling** — Automatically excludes noisy lockfiles (`package-lock.json`, `go.sum`, etc.) and truncates oversized diffs safely
 
 ## Installation
 
-```bash
-# Global install
-npm install -g @elielelie/ai-commits
+### Build from source (Go 1.24+)
 
-# via npx
-npx ai-commits
+```bash
+git clone https://github.com/eliel-elie/ai-commits.git
+cd ai-commits
+go build -o aic ./cmd/aic
+# On Windows:
+go build -o aic.exe ./cmd/aic
+```
+
+### Install directly with `go install`
+
+```bash
+go install github.com/eliel-elie/ai-commits/cmd/aic@latest
 ```
 
 ## Configuration
 
+Settings are loaded in order of precedence: **CLI flags > Environment variables > Local `.aicommits.json` > Global `~/.ai-commits`**.
+
 ```bash
 # Set AI provider
-aicommits --provider=gemini
+aic config set provider gemini
 
-# Set API keys
-aicommits --gemini-key=your_key_here
+# Set API key
+aic config set gemini-key YOUR_API_KEY
 
-# Other configurations
-aicommits --locale=en
+# Optional settings
+aic config set model gemini-2.5-flash
+aic config set locale pt-BR
+aic config set max-length 100
+aic config set max-tokens 2048
 
+# Inspect configuration (API keys are masked)
+aic config list
+aic config path
 ```
 
 ## Supported Providers
 
-| Provider	       | Default Model	       | Environment Variable |
-|-----------------|----------------------|----------------------|
-| Gemini	         | gemini-1.5-flash	 | GEMINI_KEY           |
-| OpenAI	         | gpt-3.5-turbo	       | OPENAI_KEY           |
-| DeepSeek	 | deepseek-chat	       | DEEPSEEK_KEY   |
+| Provider     | Default Model              | Config Key       | Environment Variable                     |
+|--------------|----------------------------|------------------|------------------------------------------|
+| `gemini`     | `gemini-2.5-flash`         | `GEMINI_KEY`     | `GEMINI_API_KEY` / `GEMINI_KEY`          |
+| `openai`     | `gpt-5-mini`               | `OPENAI_KEY`     | `OPENAI_API_KEY` / `OPENAI_KEY`          |
+| `deepseek`   | `deepseek-chat`            | `DEEPSEEK_KEY`   | `DEEPSEEK_API_KEY` / `DEEPSEEK_KEY`      |
+| `groq`       | `llama-3.3-70b-versatile`  | `GROQ_KEY`       | `GROQ_API_KEY` / `GROQ_KEY`              |
+| `openrouter` | `openai/gpt-4o-mini`       | `OPENROUTER_KEY` | `OPENROUTER_API_KEY` / `OPENROUTER_KEY`  |
+| `ollama`     | `llama3.2`                 | —                | `base_url` (default `http://localhost:11434/v1`) |
 
 ## Usage
 
 ```bash
-# Commit with staged files
-aicommits
-# or 
-aic # alias
+# Commit staged changes in the current directory
+aic
 
-# Commit including all modified files
-aicommits --all
+# Stage all changes and commit
+aic --all
 
-# Commit including one modified files
-aicommits --file <file_path>
+# Stage and commit multiple specific files (space-separated or repeated -f)
+aic -f cmd/aic/main.go internal/git/git.go
+aic -f cmd/aic/main.go -f internal/git/git.go
 
-# Specify provider
-aicommits --provider=gemini
+# Target another repository directory
+aic -C /path/to/repo --all
 
-# Specify model
-aicommits --model=gemini-1.5-flash
+# Dry run (print generated message without committing)
+aic --dry
 
-# Dry message
-aicommits --dry
+# Skip interactive confirmation
+aic --yes
 
-# Ignore hooks
-aicommits --no-verify
+# Give extra context to the AI
+aic --hint "fixes issue #42"
 
+# Override provider/model/locale for a single run
+aic -p openai -m gpt-5-mini -l pt-BR
+
+# Bypass git hooks
+aic --no-verify
 ```
 
-## Provider Configuration
+### Available Flags
 
-### Google Gemini
+| Flag | Short | Description |
+|------|-------|-------------|
+| `--dir` | `-C` | Target git repository directory (default `.`) |
+| `--file` | `-f` | Specific file(s) to stage and commit (space-separated, e.g. `-f a.go b.go`) |
+| `--all` | `-a` | Stage all changes before generating the commit message |
+| `--dry` | `-d` | Generate and print the commit message without committing |
+| `--yes` | `-y` | Skip interactive confirmation and commit immediately |
+| `--no-verify` | | Bypass git `pre-commit` and `commit-msg` hooks |
+| `--hint` | | Extra context or instructions for the AI |
+| `--provider` | `-p` | Override AI provider |
+| `--model` | `-m` | Override AI model |
+| `--locale` | `-l` | Override locale (`en`, `pt-BR`, `es`) |
+| `--max-length` | | Override target subject line length |
+| `--exclude` | | Additional file patterns to exclude from diff |
+| `--version` | `-v` | Show version |
 
-1. Obtain an API Key from [Google AI Studio](https://aistudio.google.com/).
+---
 
-2. Configure it:
-
-```bash
-aicommits --provider=gemini
-aicommits --gemini-key=your_key
-```
-
-### OpenAI
-
-1. Obtain an API Key from [OpenAI Dashboard](https://platform.openai.com/).
-
-2. Configure it:
-
-```bash
-aicommits --provider=openai
-aicommits --openai-key==your_key
-```
-
-### DeepSeek
-
-1. Obtain an API Key from [DeepSeek Platform](https://platform.deepseek.com/).
-
-2. Configure it:
-
-```bash
-aicommits --provider=deepseek
-aicommits --deepseek-key==your_key
-```
- 
-### Where is my API key stored?
-
-Credentials are stored locally at ```~/.ai-commits```
-
-
-** The inspiration for this project was based on [Nutlope/aicommits](https://github.com/Nutlope/aicommits).
+> Note: The legacy Node.js implementation is archived in [`old_project/`](old_project/).  
+> Inspired by [Nutlope/aicommits](https://github.com/Nutlope/aicommits).
