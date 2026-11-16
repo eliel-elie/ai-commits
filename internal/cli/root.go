@@ -123,31 +123,41 @@ func runCommitFlow(ctx context.Context, opts *rootOptions) error {
 
 	excludes := mergeExcludes(cfg.Exclude, opts.excludes)
 
-	var stagedFiles []string
-	var diff, stat string
-	err = ui.RunWithSpinner(msgBundle.DetectingFiles, func() error {
-		var e error
-		stagedFiles, e = repo.StagedFiles(opts.files, excludes)
-		if e != nil {
-			return e
-		}
-		if len(stagedFiles) == 0 {
-			return nil
-		}
-		diff, e = repo.StagedDiff(opts.files, excludes)
-		if e != nil {
-			return e
-		}
-		stat, _ = repo.StagedStat(opts.files, excludes)
-		return nil
-	})
+	stagedFiles, diff, stat, err := detectStaged(msgBundle.DetectingFiles, repo, opts.files, excludes)
 	if err != nil {
 		return err
 	}
 
 	if len(stagedFiles) == 0 || strings.TrimSpace(diff) == "" {
-		ui.PrintWarn(msgBundle.NoChanges)
-		return nil
+		if len(opts.files) == 0 && !opts.all {
+			if unstaged, uErr := repo.UnstagedFiles(); uErr == nil && len(unstaged) > 0 {
+				ui.PrintUnstagedFiles(msgBundle.UnstagedFound(len(unstaged)), unstaged)
+				if opts.yes || opts.dry {
+					ui.PrintWarn(msgBundle.NoChanges)
+					return nil
+				}
+				ok, cErr := ui.ConfirmStage(msgBundle.ConfirmStageAll)
+				if cErr != nil {
+					return cErr
+				}
+				if !ok {
+					ui.PrintWarn(msgBundle.CommitCancelled)
+					return nil
+				}
+				ui.PrintInfo(msgBundle.StagingAll)
+				if err := repo.StageAll(); err != nil {
+					return err
+				}
+				stagedFiles, diff, stat, err = detectStaged(msgBundle.DetectingFiles, repo, opts.files, excludes)
+				if err != nil {
+					return err
+				}
+			}
+		}
+		if len(stagedFiles) == 0 || strings.TrimSpace(diff) == "" {
+			ui.PrintWarn(msgBundle.NoChanges)
+			return nil
+		}
 	}
 
 	ui.PrintFiles(msgBundle.FilesDetected(len(stagedFiles)), stagedFiles)
@@ -272,4 +282,26 @@ func mergeExcludes(cfgExcludes, flagExcludes []string) []string {
 	merged = append(merged, cfgExcludes...)
 	merged = append(merged, flagExcludes...)
 	return merged
+}
+
+func detectStaged(label string, repo *git.Repo, files, excludes []string) ([]string, string, string, error) {
+	var stagedFiles []string
+	var diff, stat string
+	err := ui.RunWithSpinner(label, func() error {
+		var e error
+		stagedFiles, e = repo.StagedFiles(files, excludes)
+		if e != nil {
+			return e
+		}
+		if len(stagedFiles) == 0 {
+			return nil
+		}
+		diff, e = repo.StagedDiff(files, excludes)
+		if e != nil {
+			return e
+		}
+		stat, _ = repo.StagedStat(files, excludes)
+		return nil
+	})
+	return stagedFiles, diff, stat, err
 }

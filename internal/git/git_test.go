@@ -110,3 +110,47 @@ func TestMultiFileAndLargeCommitMessage(t *testing.T) {
 		t.Fatalf("expected c.txt to remain staged, got %v", remaining)
 	}
 }
+
+func TestSubdirScopeStageAllAndUnstagedFiles(t *testing.T) {
+	dir := initTempRepo(t)
+
+	subDir := filepath.Join(dir, "app", "Services", "Amazon")
+	if err := os.MkdirAll(subDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(subDir, "Client.php"), []byte("<?php // v1\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(dir, "outside.txt"), []byte("outside\n"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	subRepo, err := Open(subDir)
+	if err != nil {
+		t.Fatalf("Open(%q) failed: %v", subDir, err)
+	}
+
+	unstaged, err := subRepo.UnstagedFiles()
+	if err != nil {
+		t.Fatalf("UnstagedFiles failed: %v", err)
+	}
+	if len(unstaged) != 1 || !strings.HasSuffix(unstaged[0], "Client.php") {
+		t.Fatalf("expected only Client.php in unstaged, got %v", unstaged)
+	}
+
+	if err := subRepo.StageAll(); err != nil {
+		t.Fatalf("StageAll failed: %v", err)
+	}
+
+	rootRepo, err := Open(dir)
+	if err != nil {
+		t.Fatalf("Open(%q) failed: %v", dir, err)
+	}
+	stagedAtRoot, err := rootRepo.StagedFiles(nil, nil)
+	if err != nil {
+		t.Fatalf("StagedFiles at root failed: %v", err)
+	}
+	if len(stagedAtRoot) != 1 || stagedAtRoot[0] != "app/Services/Amazon/Client.php" {
+		t.Fatalf("expected only app/Services/Amazon/Client.php staged, got %v", stagedAtRoot)
+	}
+}

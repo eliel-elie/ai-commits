@@ -13,6 +13,9 @@ type Messages struct {
 	StagingFiles     string
 	DetectingFiles   string
 	NoChanges        string
+	UnstagedFoundOne string
+	UnstagedFoundN   string
+	ConfirmStageAll  string
 	FilesDetectedOne string
 	FilesDetectedN   string
 	Analyzing        string
@@ -41,6 +44,9 @@ var catalog = map[string]Messages{
 		StagingFiles:     "Staging %d specific file(s)...",
 		DetectingFiles:   "Detecting staged files...",
 		NoChanges:        "No staged changes detected. Stage your changes or use --all / --file.",
+		UnstagedFoundOne: "1 unstaged change detected in this directory:",
+		UnstagedFoundN:   "%d unstaged changes detected in this directory:",
+		ConfirmStageAll:  "Stage these changes and continue?",
 		FilesDetectedOne: "1 staged file detected:",
 		FilesDetectedN:   "%d staged files detected:",
 		Analyzing:        "Analyzing changes with AI...",
@@ -67,6 +73,9 @@ var catalog = map[string]Messages{
 		StagingFiles:     "Adicionando %d arquivo(s) específico(s) ao stage...",
 		DetectingFiles:   "Detectando arquivos no stage...",
 		NoChanges:        "Nenhuma alteração no stage encontrada. Use `git add`, --all ou --file.",
+		UnstagedFoundOne: "1 alteração fora do stage detectada neste diretório:",
+		UnstagedFoundN:   "%d alterações fora do stage detectadas neste diretório:",
+		ConfirmStageAll:  "Adicionar essas alterações ao stage e continuar?",
 		FilesDetectedOne: "1 arquivo no stage detectado:",
 		FilesDetectedN:   "%d arquivos no stage detectados:",
 		Analyzing:        "Analisando alterações com IA...",
@@ -93,6 +102,9 @@ var catalog = map[string]Messages{
 		StagingFiles:     "Agregando %d archivo(s) específico(s) al stage...",
 		DetectingFiles:   "Detectando archivos en stage...",
 		NoChanges:        "No se detectaron cambios en stage. Usa `git add`, --all o --file.",
+		UnstagedFoundOne: "1 cambio sin stage detectado en este directorio:",
+		UnstagedFoundN:   "%d cambios sin stage detectados en este directorio:",
+		ConfirmStageAll:  "¿Agregar estos cambios al stage y continuar?",
 		FilesDetectedOne: "1 archivo en stage detectado:",
 		FilesDetectedN:   "%d archivos en stage detectados:",
 		Analyzing:        "Analizando cambios con IA...",
@@ -133,4 +145,12 @@ func (m Messages) FilesDetected(count int) string {
 		return m.FilesDetectedOne
 	}
 	return fmt.Sprintf(m.FilesDetectedN, count)
+}
+
+// UnstagedFound returns the singular or plural count message for unstaged changes.
+func (m Messages) UnstagedFound(count int) string {
+	if count == 1 {
+		return m.UnstagedFoundOne
+	}
+	return fmt.Sprintf(m.UnstagedFoundN, count)
 }

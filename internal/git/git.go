@@ -61,10 +61,30 @@ func Open(dir string) (*Repo, error) {
 	}, nil
 }
 
-// StageAll stages all changes in the repository.
+// StageAll stages all changes within WorkDir.
 func (r *Repo) StageAll() error {
-	_, err := runGit(r.WorkDir, nil, "add", "-A")
+	_, err := runGit(r.WorkDir, nil, "add", "-A", "--", ".")
 	return err
+}
+
+// UnstagedFiles returns modified, deleted, or untracked file paths within WorkDir.
+func (r *Repo) UnstagedFiles() ([]string, error) {
+	out, err := runGit(r.WorkDir, nil, "-c", "core.quotePath=false", "status", "--porcelain", "-uall", "--", ".")
+	if err != nil {
+		return nil, err
+	}
+
+	var result []string
+	for _, line := range strings.Split(strings.ReplaceAll(out, "\r\n", "\n"), "\n") {
+		if len(line) < 4 {
+			continue
+		}
+		path := strings.TrimSpace(line[3:])
+		if path != "" {
+			result = append(result, path)
+		}
+	}
+	return result, nil
 }
 
 // StageFiles stages the specified files relative to WorkDir.

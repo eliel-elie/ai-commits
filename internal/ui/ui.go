@@ -69,6 +69,14 @@ func PrintFiles(header string, files []string) {
 	}
 }
 
+// PrintUnstagedFiles displays the list of unstaged files with a warning header.
+func PrintUnstagedFiles(header string, files []string) {
+	fmt.Println(warnStyle.Render("! " + header))
+	for _, f := range files {
+		fmt.Println("  " + fileStyle.Render(f))
+	}
+}
+
 // PrintMessageBox renders the generated commit message inside a bordered box.
 func PrintMessageBox(message string) {
 	fmt.Println(boxStyle.Render(message))
@@ -170,4 +178,23 @@ func AskHint(m i18n.Messages) (string, bool, error) {
 		return "", false, err
 	}
 	return hint, true, nil
+}
+
+// ConfirmStage asks the user whether to stage detected unstaged changes and continue.
+func ConfirmStage(title string) (bool, error) {
+	confirm := true
+	form := huh.NewForm(
+		huh.NewGroup(
+			huh.NewConfirm().
+				Title(title).
+				Value(&confirm),
+		),
+	)
+	if err := form.Run(); err != nil {
+		if errors.Is(err, huh.ErrUserAborted) {
+			return false, nil
+		}
+		return false, err
+	}
+	return confirm, nil
 }
