@@ -171,8 +171,3 @@ aic --no-verify
 | `--max-length` | | Override target subject line length |
 | `--exclude` | | Additional file patterns to exclude from diff |
 | `--version` | `-v` | Show version |
-
----
-
-> Note: The legacy Node.js implementation is archived in [`old_project/`](old_project/).  
-> Inspired by [Nutlope/aicommits](https://github.com/Nutlope/aicommits).
