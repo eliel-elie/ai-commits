@@ -20,6 +20,22 @@ Intelligent git commit message generator written in Go, powered by multiple AI p
 
 ## Installation
 
+### Quick Install (without Go)
+
+**Windows (PowerShell):**
+
+```powershell
+irm https://raw.githubusercontent.com/eliel-elie/ai-commits/main/install.ps1 | iex
+```
+
+**Linux / macOS:**
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/eliel-elie/ai-commits/main/install.sh | sh
+```
+
+> Both scripts download the latest pre-built binary from GitHub Releases and add `aic` to your `PATH` (supports `amd64` and `arm64`).
+
 ### Build from source (Go 1.24+)
 
 ```bash
@@ -35,6 +51,17 @@ go build -o aic.exe ./cmd/aic
 ```bash
 go install github.com/eliel-elie/ai-commits/cmd/aic@latest
 ```
+
+### Updating
+
+Once installed, you can update `aic` directly from the binary (no Go or external tools required):
+
+```bash
+aic update          # Download and install the latest GitHub release
+aic update --check  # Only check if a newer version is available
+```
+
+> By default, `aic` also checks silently at most once every 24 hours and notifies you if a newer version is available (set `AIC_NO_UPDATE_CHECK=1` to disable).
 
 ### Building Binaries (Windows & Linux)
 

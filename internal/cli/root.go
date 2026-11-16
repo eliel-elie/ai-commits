@@ -11,10 +11,12 @@ import (
 	"github.com/eliel-elie/ai-commits/internal/prompt"
 	"github.com/eliel-elie/ai-commits/internal/provider"
 	"github.com/eliel-elie/ai-commits/internal/ui"
+	"github.com/eliel-elie/ai-commits/internal/updater"
 	"github.com/spf13/cobra"
 )
 
-const Version = "1.0.0"
+// Version is overridden at build time via -ldflags when creating releases.
+var Version = "1.0.0"
 
 type rootOptions struct {
 	dir       string
@@ -69,11 +71,24 @@ func NewRootCmd() *cobra.Command {
 
 	cmd.MarkFlagsMutuallyExclusive("all", "file")
 	cmd.AddCommand(newConfigCmd())
+	cmd.AddCommand(newUpdateCmd())
 
 	return cmd
 }
 
 func runCommitFlow(ctx context.Context, opts *rootOptions) error {
+	updater.CleanupOldBinary()
+	updateCh := updater.StartBackgroundCheck(ctx, Version)
+	defer func() {
+		select {
+		case newerTag, ok := <-updateCh:
+			if ok && newerTag != "" {
+				ui.PrintWarn(fmt.Sprintf("Update available: v%s -> %s (run \"aic update\")", Version, newerTag))
+			}
+		default:
+		}
+	}()
+
 	repo, err := git.Open(opts.dir)
 	if err != nil {
 		return err
