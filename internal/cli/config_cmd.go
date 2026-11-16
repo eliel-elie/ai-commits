@@ -57,10 +57,27 @@ func newConfigGetCmd() *cobra.Command {
 				canonical = args[0]
 			}
 
+			cfg, err := config.Load(".")
+			if err != nil {
+				return err
+			}
+
 			raw, err := config.GetGlobalRaw()
 			if err != nil {
 				return err
 			}
+
+			// Show effective env override if an API key is overridden by environment variables.
+			if strings.HasSuffix(canonical, "_KEY") {
+				provName := strings.ToLower(strings.TrimSuffix(canonical, "_KEY"))
+				if effective := cfg.APIKeyFor(provName); effective != "" {
+					if rawVal, ok := raw[canonical].(string); !ok || rawVal != effective {
+						fmt.Printf("%s (from env)\n", config.MaskSecret(effective))
+						return nil
+					}
+				}
+			}
+
 			if val, ok := raw[canonical]; ok {
 				if strings.HasSuffix(strings.ToUpper(canonical), "_KEY") {
 					if s, ok := val.(string); ok {
@@ -69,11 +86,6 @@ func newConfigGetCmd() *cobra.Command {
 				}
 				fmt.Println(val)
 				return nil
-			}
-
-			cfg, err := config.Load(".")
-			if err != nil {
-				return err
 			}
 			switch canonical {
 			case "AI_PROVIDER":

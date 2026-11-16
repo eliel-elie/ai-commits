@@ -204,6 +204,9 @@ func applyEnv(cfg *Config) {
 
 func firstNonEmpty(values ...string) string {
 	for _, v := range values {
+		v = strings.TrimSpace(v)
+		v = strings.Trim(v, `"'`)
+		v = strings.TrimSpace(v)
 		if v != "" {
 			return v
 		}
