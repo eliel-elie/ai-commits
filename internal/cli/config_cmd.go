@@ -67,14 +67,17 @@ func newConfigGetCmd() *cobra.Command {
 				return err
 			}
 
-			// Show effective env override if an API key is overridden by environment variables.
+			// Show effective API key with its resolved source (AIC_* env > local > global > generic env fallback).
 			if strings.HasSuffix(canonical, "_KEY") {
 				provName := strings.ToLower(strings.TrimSuffix(canonical, "_KEY"))
 				if effective := cfg.APIKeyFor(provName); effective != "" {
-					if rawVal, ok := raw[canonical].(string); !ok || rawVal != effective {
-						fmt.Printf("%s (from env)\n", config.MaskSecret(effective))
-						return nil
+					src := cfg.SourceFor(canonical)
+					if src != "" {
+						fmt.Printf("%s (%s)\n", config.MaskSecret(effective), src)
+					} else {
+						fmt.Println(config.MaskSecret(effective))
 					}
+					return nil
 				}
 			}
 

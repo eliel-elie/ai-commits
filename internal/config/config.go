@@ -50,6 +50,8 @@ type Config struct {
 	DeepSeekKey   string `json:"DEEPSEEK_KEY,omitempty"`
 	GroqKey       string `json:"GROQ_KEY,omitempty"`
 	OpenRouterKey string `json:"OPENROUTER_KEY,omitempty"`
+
+	Sources map[string]string `json:"-"`
 }
 
 // rawConfig supports legacy Node.js values where MAX_LENGTH could be stored as string or number.
@@ -77,34 +79,42 @@ func GlobalConfigPath() (string, error) {
 	return filepath.Join(home, GlobalConfigName), nil
 }
 
-// Load merges global (~/.ai-commits), local (<repoDir>/.aicommits.json), and environment variables.
+// Load merges defaults, generic env fallbacks, global (~/.ai-commits), local (<repoDir>/.aicommits.json), and AIC_* env overrides.
 func Load(repoDir string) (*Config, error) {
 	cfg := &Config{
 		Provider:  DefaultProvider,
 		Locale:    DefaultLocale,
 		MaxLength: DefaultMaxLength,
 		MaxTokens: DefaultMaxTokens,
+		Sources: map[string]string{
+			"AI_PROVIDER": "default",
+			"locale":      "default",
+			"MAX_LENGTH":  "default",
+			"max_tokens":  "default",
+		},
 	}
+
+	applyFallbackEnv(cfg)
 
 	globalPath, err := GlobalConfigPath()
 	if err == nil {
-		if err := mergeFile(cfg, globalPath); err != nil {
+		if err := mergeFile(cfg, globalPath, "global"); err != nil {
 			return nil, err
 		}
 	}
 
 	if repoDir != "" {
 		localPath := filepath.Join(repoDir, LocalConfigName)
-		if err := mergeFile(cfg, localPath); err != nil {
+		if err := mergeFile(cfg, localPath, "local"); err != nil {
 			return nil, err
 		}
 	}
 
-	applyEnv(cfg)
+	applyScopedEnv(cfg)
 	return cfg, nil
 }
 
-func mergeFile(cfg *Config, path string) error {
+func mergeFile(cfg *Config, path, source string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -123,41 +133,53 @@ func mergeFile(cfg *Config, path string) error {
 
 	if raw.Provider != "" {
 		cfg.Provider = raw.Provider
+		cfg.Sources["AI_PROVIDER"] = source
 	}
 	if raw.Model != "" {
 		cfg.Model = raw.Model
+		cfg.Sources["model"] = source
 	}
 	if raw.Locale != "" {
 		cfg.Locale = raw.Locale
+		cfg.Sources["locale"] = source
 	}
 	if raw.MaxTokens > 0 {
 		cfg.MaxTokens = raw.MaxTokens
+		cfg.Sources["max_tokens"] = source
 	}
 	if raw.BaseURL != "" {
 		cfg.BaseURL = raw.BaseURL
+		cfg.Sources["base_url"] = source
 	}
 	if len(raw.Exclude) > 0 {
 		cfg.Exclude = raw.Exclude
+		cfg.Sources["exclude"] = source
 	}
-	if raw.GeminiKey != "" {
-		cfg.GeminiKey = raw.GeminiKey
+	if v := cleanSecret(raw.GeminiKey); v != "" {
+		cfg.GeminiKey = v
+		cfg.Sources["GEMINI_KEY"] = source
 	}
-	if raw.OpenAIKey != "" {
-		cfg.OpenAIKey = raw.OpenAIKey
+	if v := cleanSecret(raw.OpenAIKey); v != "" {
+		cfg.OpenAIKey = v
+		cfg.Sources["OPENAI_KEY"] = source
 	}
-	if raw.DeepSeekKey != "" {
-		cfg.DeepSeekKey = raw.DeepSeekKey
+	if v := cleanSecret(raw.DeepSeekKey); v != "" {
+		cfg.DeepSeekKey = v
+		cfg.Sources["DEEPSEEK_KEY"] = source
 	}
-	if raw.GroqKey != "" {
-		cfg.GroqKey = raw.GroqKey
+	if v := cleanSecret(raw.GroqKey); v != "" {
+		cfg.GroqKey = v
+		cfg.Sources["GROQ_KEY"] = source
 	}
-	if raw.OpenRouterKey != "" {
-		cfg.OpenRouterKey = raw.OpenRouterKey
+	if v := cleanSecret(raw.OpenRouterKey); v != "" {
+		cfg.OpenRouterKey = v
+		cfg.Sources["OPENROUTER_KEY"] = source
 	}
 
 	if len(raw.MaxLength) > 0 {
 		if parsed := parseFlexibleInt(raw.MaxLength); parsed > 0 {
 			cfg.MaxLength = parsed
+			cfg.Sources["MAX_LENGTH"] = source
 		}
 	}
 
@@ -178,40 +200,103 @@ func parseFlexibleInt(raw json.RawMessage) int {
 	return 0
 }
 
-func applyEnv(cfg *Config) {
-	if v := os.Getenv("AI_PROVIDER"); v != "" {
-		cfg.Provider = v
-	}
-	if v := os.Getenv("AI_MODEL"); v != "" {
-		cfg.Model = v
-	}
-	if v := firstNonEmpty(os.Getenv("GEMINI_API_KEY"), os.Getenv("GEMINI_KEY")); v != "" {
+func applyFallbackEnv(cfg *Config) {
+	if v, name := firstEnv("GEMINI_API_KEY", "GEMINI_KEY"); v != "" {
 		cfg.GeminiKey = v
+		cfg.Sources["GEMINI_KEY"] = "env:" + name
 	}
-	if v := firstNonEmpty(os.Getenv("OPENAI_API_KEY"), os.Getenv("OPENAI_KEY")); v != "" {
+	if v, name := firstEnv("OPENAI_API_KEY", "OPENAI_KEY"); v != "" {
 		cfg.OpenAIKey = v
+		cfg.Sources["OPENAI_KEY"] = "env:" + name
 	}
-	if v := firstNonEmpty(os.Getenv("DEEPSEEK_API_KEY"), os.Getenv("DEEPSEEK_KEY")); v != "" {
+	if v, name := firstEnv("DEEPSEEK_API_KEY", "DEEPSEEK_KEY"); v != "" {
 		cfg.DeepSeekKey = v
+		cfg.Sources["DEEPSEEK_KEY"] = "env:" + name
 	}
-	if v := firstNonEmpty(os.Getenv("GROQ_API_KEY"), os.Getenv("GROQ_KEY")); v != "" {
+	if v, name := firstEnv("GROQ_API_KEY", "GROQ_KEY"); v != "" {
 		cfg.GroqKey = v
+		cfg.Sources["GROQ_KEY"] = "env:" + name
 	}
-	if v := firstNonEmpty(os.Getenv("OPENROUTER_API_KEY"), os.Getenv("OPENROUTER_KEY")); v != "" {
+	if v, name := firstEnv("OPENROUTER_API_KEY", "OPENROUTER_KEY"); v != "" {
 		cfg.OpenRouterKey = v
+		cfg.Sources["OPENROUTER_KEY"] = "env:" + name
 	}
 }
 
-func firstNonEmpty(values ...string) string {
-	for _, v := range values {
-		v = strings.TrimSpace(v)
-		v = strings.Trim(v, `"'`)
-		v = strings.TrimSpace(v)
-		if v != "" {
-			return v
+func applyScopedEnv(cfg *Config) {
+	if v, name := firstEnv("AIC_PROVIDER", "AI_PROVIDER"); v != "" {
+		cfg.Provider = v
+		cfg.Sources["AI_PROVIDER"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_MODEL", "AI_MODEL"); v != "" {
+		cfg.Model = v
+		cfg.Sources["model"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_LOCALE"); v != "" {
+		cfg.Locale = v
+		cfg.Sources["locale"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_GEMINI_KEY"); v != "" {
+		cfg.GeminiKey = v
+		cfg.Sources["GEMINI_KEY"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_OPENAI_KEY"); v != "" {
+		cfg.OpenAIKey = v
+		cfg.Sources["OPENAI_KEY"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_DEEPSEEK_KEY"); v != "" {
+		cfg.DeepSeekKey = v
+		cfg.Sources["DEEPSEEK_KEY"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_GROQ_KEY"); v != "" {
+		cfg.GroqKey = v
+		cfg.Sources["GROQ_KEY"] = "env:" + name
+	}
+	if v, name := firstEnv("AIC_OPENROUTER_KEY"); v != "" {
+		cfg.OpenRouterKey = v
+		cfg.Sources["OPENROUTER_KEY"] = "env:" + name
+	}
+}
+
+func firstEnv(names ...string) (string, string) {
+	for _, name := range names {
+		if v := cleanSecret(os.Getenv(name)); v != "" {
+			return v, name
 		}
 	}
-	return ""
+	return "", ""
+}
+
+func cleanSecret(v string) string {
+	v = strings.TrimSpace(v)
+	v = strings.Trim(v, `"'`)
+	return strings.TrimSpace(v)
+}
+
+// SourceFor returns the origin of a canonical config key (e.g. "global", "local", "env:GEMINI_API_KEY", "default").
+func (c *Config) SourceFor(canonical string) string {
+	if c.Sources == nil {
+		return ""
+	}
+	return c.Sources[canonical]
+}
+
+// KeySourceFor returns the origin of the API key for the given provider.
+func (c *Config) KeySourceFor(provider string) string {
+	switch strings.ToLower(provider) {
+	case "gemini":
+		return c.SourceFor("GEMINI_KEY")
+	case "openai":
+		return c.SourceFor("OPENAI_KEY")
+	case "deepseek":
+		return c.SourceFor("DEEPSEEK_KEY")
+	case "groq":
+		return c.SourceFor("GROQ_KEY")
+	case "openrouter":
+		return c.SourceFor("OPENROUTER_KEY")
+	default:
+		return ""
+	}
 }
 
 // APIKeyFor returns the configured API key for the given provider.

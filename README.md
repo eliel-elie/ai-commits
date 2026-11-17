@@ -91,7 +91,7 @@ GOOS=windows GOARCH=amd64 go build -ldflags="-s -w" -o aic.exe ./cmd/aic
 
 ## Configuration
 
-Settings are loaded in order of precedence: **CLI flags > Environment variables > Local `.aicommits.json` > Global `~/.ai-commits`**.
+Settings are loaded in order of precedence: **CLI flags > Scoped env (`AIC_*`, `AI_PROVIDER`, `AI_MODEL`) > Local `.aicommits.json` > Global `~/.ai-commits` > Generic env fallbacks (`GEMINI_API_KEY`, `OPENAI_API_KEY`, etc.)**.
 
 ```bash
 # Set AI provider

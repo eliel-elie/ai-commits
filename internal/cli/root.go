@@ -182,6 +182,9 @@ func runCommitFlow(ctx context.Context, opts *rootOptions) error {
 			return genErr
 		})
 		if err != nil {
+			if src := cfg.KeySourceFor(prov.Name()); src != "" && isAuthError(err) {
+				return fmt.Errorf("%w (key source: %s)", err, src)
+			}
 			return err
 		}
 
@@ -206,6 +209,9 @@ func runCommitFlow(ctx context.Context, opts *rootOptions) error {
 		ui.PrintMessageBox(commitMsg)
 		action, err := ui.ChooseAction(msgBundle)
 		if err != nil {
+			if src := cfg.KeySourceFor(prov.Name()); src != "" && isAuthError(err) {
+				return fmt.Errorf("%w (key source: %s)", err, src)
+			}
 			return err
 		}
 
@@ -257,6 +263,15 @@ func runCommitFlow(ctx context.Context, opts *rootOptions) error {
 			return nil
 		}
 	}
+}
+
+func isAuthError(err error) bool {
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "api key") ||
+		strings.Contains(msg, "invalid_api_key") ||
+		strings.Contains(msg, "unauthorized") ||
+		strings.Contains(msg, "(401)") ||
+		strings.Contains(msg, "(403)")
 }
 
 func applyFlagOverrides(cfg *config.Config, opts *rootOptions) {
